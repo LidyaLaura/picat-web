@@ -1,269 +1,296 @@
-import React from 'react';
-import { FiMoon } from 'react-icons/fi';
+import { Box, Field, Image, Input, Slider, Text } from '@chakra-ui/react';
+import Navbar from '../components/Navbar';
+import { useState } from 'react';
+import { toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { useTheme } from '../context/theme-context';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const logo = '/assets/light theme logo.png';
+const MotionBox = motion(Box);
+const MotionImage = motion(Image);
+const MotionText = motion(Text);
 
-const HeaderStyles = () => (
-  <style>
-    {`
-      @import url('https://fonts.googleapis.com/css2?family=Jersey+20&display=swap');
+function Decoration() {
+  const { isDarkMode } = useTheme();
+  return <Box width={"3px"} height={"100%"} bgColor={isDarkMode ? "gray.400" : "gray.600"}></Box>
+}
 
-      .app-wrapper {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        background-color: #ffffff;
-      
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0px 40px;
-        background-color: #f0f0f0;
-        border-bottom: 1px solid #e0e0e0;
-        opacity: 0.8;
-
-      }
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .pixel-triangle {
-        width: 0;
-        height: 0;
-        border-top: 12px solid transparent;
-        border-bottom: 12px solid transparent;
-        border-right: 16px solid black;
-        image-rendering: pixelated;
-        
-      }
-
-      .header-logo {
-        font-family: "Jersey 20", sans-serif;
-        font-size: 50px;
-        color: black;
-      }
-
-      .logo-relative {
-        position: relative;
-        display: inline-block;
-      }
-
-      .pixel-text {
-        position: relative;
-        font-family: 'Jersey 20', sans-serif;
-        font-size: 100px;
-        color: black;
-        z-index: 2;
-      }
-
-      .cat-behind {
-        position: absolute;
-        left: 75px; /* sesuaikan jarak dari kiri */
-        top: -10px; /* sesuaikan tinggi */
-        height: 80px;
-        z-index: 1;
-        opacity: 1;
-        pointer-events: none;
-        object-fit: cover;
-        zoom: 1.8;
-      
-      }
-
-      .theme-switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-      }
-
-      .theme-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end; 
-      }
-
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-      }
-
-      .moon-icon {
-        font-size: 20px;
-        color: #f1c40f;
-        margin-right: 8px; 
-        opacity: 0;
-        transition: opacity 0.4s ease;
-      }
-
-      .theme-switch input:checked + .slider {
-        background-color: #4A4A4A;
-      }
-
-      .theme-switch input:checked + .slider:before {
-        transform: translateX(26px);
-      }
-
-      .theme-switch input:checked + .slider .moon-icon {
-        opacity: 1;
-      }
-
-      .splash-screen {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column; 
-        justify-content: center;
-        align-items: center; 
-        font-family: 'Jersey 20', sans-serif;
-        padding-bottom: 50px;
-        background-color: #ffffff;
-        color: black;
+function Music() {
+  const { isDarkMode } = useTheme();
+  const [useTwoInput, setUseTwoInput] = useState(false);
+  const [userInput, setUserInput] = useState({ title: "", description: "", threshold: 0.5 });
+  const [apiResponseData, setApiResponseData] = useState(null);
   
-      }
+  const truncateText = (text, maxLength) => {
+    if (!text) return '-';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
 
-      .logo-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 100px;
-        font-weight: bold;
-        min-width: 100%;
-      }
+  const handleTitleChange = (e) => {
+    setUserInput(prev => ({ ...prev, title: e.target.value }));
+  };
 
-      .pixel-text {
-        font-family: 'Jersey 20', monospace;
-        font-size: 100px;
-        color: black;
-        
-      }
+  const handleDescriptionChange = (e) => {
+    setUserInput(prev => ({ ...prev, description: e.target.value }));
+  };
 
-      .cat-img {
-        height: 80px;
-        margin-left: -30px;
-        margin-top: -5px;
-        
-      }
+  const handleThresholdChange = (value) => {
+    const sliderValueArray = value.value;
+    const sliderValue = Array.isArray(sliderValueArray) ? sliderValueArray[0] : sliderValueArray;
+    if (typeof sliderValue === 'number' && !isNaN(sliderValue)) {
+      setUserInput(prev => ({ ...prev, threshold: sliderValue / 100 }));
+    }
+  };
 
-      .search-bar-container {
-        display: flex;
-        align-items: center;
-        background-color: #f6f6f6;
-        border-radius: 30px;
-        padding: 5px;
-        width: 60%;
-        max-width: 600px;
-
-      }
-
-      .music-tab {
-        padding: 10px 16px;
-        background-color: grey;
-        border-right: 1px solid #ccc;
-        border-radius: 30px 0 0 30px;
-        font-size: 14px;
-        color:white;
-      }
-
-      .search-input {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 20px;
-      }
-
-      .search-button {
-        padding: 0 15px;
-        font-size: 18px;
-        background: none;
-        border: none;
-        cursor: pointer;
-      }
-    `}
-  </style>
-);
-
-
-const Header = () => {
+  const handleSearch = async () => {
+    if (userInput.title.trim() === "" && userInput.description.trim() === "") {
+      toast.error("Minimal salah satu, Title atau Description, harus diisi.", {
+        position: "bottom-center",
+        theme: isDarkMode ? "light" : "dark",
+      });
+      return;
+    }
     
-  function changePage(url){
-    window.location = url;
-  }
+    setApiResponseData(null);
+
+    const toastId = toast.loading("Mencari kategori musik...", {
+      position: "bottom-center",
+      theme: isDarkMode ? "light" : "dark",
+    });
+
+    let searchData = useTwoInput
+      ? { title: userInput.title, description: userInput.description, threshold: userInput.threshold }
+      : { title: userInput.title, threshold: userInput.threshold };
+
+    try {
+      const API_URL = 'https://tohpati.pythonanywhere.com/predict/music'; 
+      const response = await axios.post(API_URL, searchData);
+      const apiResponse = response.data;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast.dismiss(toastId);
+      setApiResponseData(apiResponse);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || `Terjadi kesalahan pada server. Status: ${error.response?.status}`;
+      toast.update(toastId, {
+        render: `Gagal mencari: ${errorMessage}`,
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
+      setApiResponseData(null);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSearch();
+  };
   
   return (
-    <header className="header">
-      <div className="header-left">
-        <div className="pixel-triangle" onClick={() => changePage('Home')}></div>
-        <span className="header-logo">PiCat</span>
-      </div>
-      <label className="theme-switch">
-        <input type="checkbox" />
-        <span className="slider">
-          <FiMoon className="moon-icon" />
-        </span>
-      </label>
-    </header>
+    <Box width={"100%"} minHeight={"100vh"} display={"flex"} flexDir={"column"}>
+      <Navbar />
+      <Box bgColor={isDarkMode ? "gray.900" : "gray.200"} zIndex={-1} top={1} marginTop={'-5px'} marginLeft={'-5px'} left={1} position={"absolute"} width={"100%"} height={"100%"}></Box>
+      
+      <Box width={"100%"} display={"flex"} flexDir={"column"} alignItems={"center"} padding={"10px"}>
+        
+        {/* Logo with fade-down */}
+        <MotionImage
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          zoom={{base:"0.5", sm: "0.6", md: "0.7", xl: "1"}}  
+          width={"370px"} 
+          height={"150px"}
+          className="no-drag" 
+          src={`../assets/${isDarkMode ? 'dark' : 'light'}-logo-full.png`}
+        />
+
+        {/* Description with fade-in */}
+        <MotionText
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          zoom={{base:"0.9", sm: "0.95", md: "0.98", xl: "1"}}
+          padding={"5px"}
+          color={isDarkMode ? "gray.300" : "gray.700"} 
+          fontSize="lg" 
+          textAlign="center" 
+          mb="7px" 
+          maxW="600px"
+        >
+          Aplikasi ini adalah alat untuk memprediksi kategori musik (genre) berdasarkan judul atau lirik yang Anda berikan.
+        </MotionText>
+
+        {/* Input + Search area */}
+        <MotionBox
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+          zoom={{base:"0.85", sm: "0.8", md: "0.9", xl: "1"}}
+          display={"flex"} 
+          gap={"5px"} 
+          flexDir={"column"} 
+          width={"100%"} 
+          maxWidth={"650px"}
+        >
+          {/* Input Bar */}
+          <Box display={"flex"} gap={"5px"} >
+            <Field.Root position={"relative"} height={"50px"} display={"flex"} flexDir={"row"} alignItems={"center"}>
+              <Box 
+                color={isDarkMode ? "gray.200" : "gray.800"} 
+                bgColor={isDarkMode ? "gray.700" : "gray.300"} 
+                className='no-drag'
+                borderRadius={"25px 0 0 25px"} 
+                display={"flex"} 
+                justifyContent={"center"} 
+                alignItems={"center"} 
+                height={"100%"} 
+                width={"200px"}
+              >
+                Music
+              </Box>
+              <Input 
+                borderRadius={"0 25px 25px 0"} 
+                color={isDarkMode ? "gray.200" : "gray.900"}
+                bgColor={isDarkMode ? "gray.700" : "gray.300"}
+                height={"100%"} 
+                border={"none"}
+                outline={"none"}
+                placeholder={useTwoInput ? 'Input Title' : 'Input Title Or Lyrics'} 
+                value={userInput.title}
+                onChange={handleTitleChange}
+                onKeyDown={handleKeyDown}
+                _focus={{ boxShadow: isDarkMode ? "0 0 10px white" : "0 0 10px black" }}
+              />
+              <Image 
+                cursor={"pointer"} 
+                position={"absolute"} 
+                right={2}
+                width={"35px"} 
+                height={"35px"} 
+                src={`../assets/${isDarkMode ? 'light' : 'dark'}-search-icon.png`} 
+                onClick={handleSearch}
+              />
+            </Field.Root>
+
+            <Box 
+              onClick={() => setUseTwoInput(!useTwoInput)} 
+              cursor={"pointer"} 
+              borderRadius={"50%"} 
+              display={"flex"} 
+              justifyContent={"center"} 
+              alignItems={"center"} 
+              bgColor={isDarkMode ? "gray.700" : "gray.300"} 
+              width={"50px"} 
+              height={"50px"} 
+              fontSize={"40px"}
+              whileHover={{ scale: 1.1 }}
+              as={motion.div}
+              className='no-drag'
+            >
+              <Text color={isDarkMode ? "gray.200" : "gray.700"}>{useTwoInput ? '-' : '+'}</Text>
+            </Box>
+          </Box>
+
+          {/* Second input */}
+          <AnimatePresence>
+            {useTwoInput && (
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <Input 
+                  borderRadius={"25px"} 
+                  color={isDarkMode ? "gray.200" : "gray.900"}
+                  bgColor={isDarkMode ? "gray.700" : "gray.300"}
+                  height={"50px"} 
+                  border={"none"}
+                  outline={"none"}
+                  paddingLeft={"20px"}
+                  placeholder="Input Lyrics" 
+                  value={userInput.description}
+                  onChange={handleDescriptionChange}
+                  onKeyDown={handleKeyDown}
+                  _focus={{ boxShadow: isDarkMode ? "0 0 10px white" : "0 0 10px black" }}
+                />
+              </MotionBox>
+            )}
+          </AnimatePresence>
+
+          {/* Slider animasi scale-in */}
+          <MotionBox
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1, duration: 0.6 }}
+          >
+            <Slider.Root defaultValue={[50]} step={10} min={0} max={100} onValueChange={handleThresholdChange}>
+              <Slider.Control>
+                <Slider.Track position={"relative"} height={"14px"} bgColor={isDarkMode ? "gray.500" : "gray.500"}>
+                  <Slider.Range bgColor={isDarkMode ? "gray.700" : "gray.800"}/>
+                  <Box justifyContent={"space-between"} display={"flex"} width={"100%"} height={"100%"} position={"absolute"}> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> <Decoration/> </Box>
+                </Slider.Track>
+                <Slider.Thumbs />
+              </Slider.Control>
+            </Slider.Root>
+          </MotionBox>
+          <Text color={isDarkMode ? "gray.200" : "gray.800"}>{`Threshold: ${userInput.threshold.toFixed(1)}`}</Text>
+        </MotionBox>
+
+        {/* API Response animasi */}
+        <AnimatePresence>
+          {apiResponseData && (
+            <MotionBox
+              key="result"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.5 }}
+              zoom={{base:"0.85", sm: "0.8", md: "0.9", xl: "1"}} 
+              bgColor={isDarkMode ? "gray.700" : "gray.300"} 
+              borderRadius={"15px"} 
+              maxWidth={"650px"} 
+              width={"100%"}  
+              height={"230px"} 
+              padding={"10px"} 
+              display={"flex"} 
+              flexDir={"column"} 
+              marginTop={"5px"}
+            >
+              <Box height={"70px"} display={"flex"} width={"100%"} justifyContent={"space-around"} alignItems={"center"}>
+                <Box color={isDarkMode ? "gray.300" : "gray.800"} display={"flex"} flexDir={"column"} alignItems={"center"}>
+                  <Text fontSize={"22px"}>Title</Text>
+                  <Text>{truncateText(apiResponseData.title, 20)}</Text>
+                </Box>
+                <Box color={isDarkMode ? "gray.300" : "gray.800"} display={"flex"} flexDir={"column"} alignItems={"center"}>
+                  <Text fontSize={"22px"}>Lyrics</Text>
+                  <Text>{truncateText(apiResponseData.description, 50)}</Text>
+                </Box>
+              </Box>
+              <Text color={isDarkMode ? "gray.300" : "gray.800"} textAlign={"center"} fontSize={"30px"}>Categories</Text>
+              <Box 
+                bgColor={isDarkMode ? "gray.300" : "gray.800"} 
+                color={isDarkMode ? "gray.800" : "gray.300"} 
+                minH={"50px"} 
+                maxHeight={"100%"} 
+                overflowY={"auto"} 
+                borderRadius={"5px"} 
+                display={"flex"} 
+                flexDir={"column"} 
+                alignItems={"center"}
+              >
+                <Text textAlign={"center"} fontSize={"25px"}>
+                  {apiResponseData.predicted_genres?.join(', ') || 'Data tidak tersedia'}
+                </Text>
+              </Box>
+            </MotionBox>
+          )}
+        </AnimatePresence>
+      </Box>
+    </Box>
   );
-};
+}
 
-const MainContent = () => {
-  return (
-    <div className="splash-screen">
-      <div className="logo-container">
-        <div className="logo-relative">
-          <span className="pixel-text">PiCat</span>
-          <img src={logo} alt="cat" className="cat-behind" />
-        </div>
-      </div>
-
-      <div className="search-bar-container">
-        <div className="music-tab">MUSIC</div>
-        <input type="text" className="search-input" placeholder="Search bar" />
-        <button className="search-button">🔍</button>
-      </div>
-    </div>
-  );
-};
-
-
-const App = () => {
-  return (
-    <>
-      <HeaderStyles />
-      <div className="app-wrapper">
-        <Header />
-        <MainContent />
-      </div>
-    </>
-  );
-};
-
-export default App;
+export default Music;

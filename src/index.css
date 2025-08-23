@@ -1,0 +1,20 @@
+/* src/index.css */
+@font-face {
+  font-family: 'Jersey20';
+  /* Jalur relatif dari index.css ke font */
+  src: url('../public/assets/Jersey20-Regular.ttf') format('truetype'); 
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+.no-drag {
+  -webkit-user-select: none; /* Untuk browser Safari */
+  -moz-user-select: none; /* Untuk browser Firefox */
+  -ms-user-select: none; /* Untuk browser Internet Explorer/Edge */
+  user-select: none; /* Standar */
+}
+
+*{
+    font-family: 'Jersey20', sans-serif;
+}

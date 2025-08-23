@@ -1,144 +1,58 @@
-import React from 'react';
-import { FiMoon } from 'react-icons/fi';
+import { Box, Image } from '@chakra-ui/react';
+import { useTheme } from '../context/theme-context';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 
+const MotionImage = motion(Image);
 
-const logoImage = '/assets/light theme logo.png'; 
-
-const Styles = () => (
-  <style>
-    {`
-      /* Impor font yang akan digunakan */
-      @import url('https://fonts.googleapis.com/css2?family=Jersey+20&display=swap');
-   
-      .splash-screen {
-        display: flex;
-        flex-direction: column; 
-        justify-content: center;
-        align-items: center; 
-        min-height: 100vh; 
-        background-color: #ffffff;
-        position: relative; 
-        font-family: 'Jersey 20', sans-serif;
-      }
-
-      /* Logo kucing */
-      .splash-logo {
-        width: 150px; 
-        margin-bottom: -25px;
-    
-      }
-
-      .splash-title {
-        font-family: 'Jersey 20', sans-serif;
-        font-size: 52px;
-        color: #333;
-        margin: -10px;
-        line-height: 1;
-      }
-
-
-      .splash-subtitle {
-        font-size: 16px;
-        color: #333;
-        margin-top: 8px;
-        letter-spacing: 0.5px; 
-      }
-
-    
-      .theme-switch {
-        position: absolute;
-        top: 25px;         
-        right: 30px;      
-        width: 60px;
-        height: 34px;
-      }
-      
-      .theme-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-      }
-      
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      }
-      
-      .moon-icon {
-        font-size: 20px;
-        color: #f1c40f;
-        margin-right: 8px;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-      }
-
-      .theme-switch input:checked + .slider {
-        background-color: #4A4A4A;
-      }
-      
-      .theme-switch input:checked + .slider:before {
-        transform: translateX(26px);
-      }
-      
-      .theme-switch input:checked + .slider .moon-icon {
-        opacity: 1;
-      }
-    `}
-  </style>
-);
-
-
-const SplashScreen = () => {
-
-    setTimeout(() =>{
-
-        window.location.href = '/home';
-    }, 5000)
-
-    
+function LoadScreen() {
+  const { isDarkMode } = useTheme();
+  const [clicked, setClicked] = useState(false);
 
   return (
-    <>
-      <Styles /> 
-      
-      <div className="splash-screen">
-      
-        <label className="theme-switch">
-          <input type="checkbox" />
-          <span className="slider">
-            <FiMoon className="moon-icon" />
-          </span>
-        </label>
-     
-        <img src={logoImage} alt="PiCat Logo" className="splash-logo" />
-        <h1 className="splash-title">PiCat</h1>
-        <p className="splash-subtitle">Tap to Start ...</p>
-      </div>
-    </>
+    <Box
+      bgColor={isDarkMode ? "gray.900" : "gray.200"}
+      width="100%"
+      height="100vh"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <MotionImage
+        width="160px"
+        height="200px"
+        src={`../assets/${isDarkMode ? 'dark' : 'light'}-logo-loadingscreen.png`}
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={
+          clicked
+            ? { scale: 20, opacity: 0 } // Zoom out ke fullscreen
+            : {
+                opacity: 1,
+                scale: 1,
+                filter: isDarkMode
+                  ? "drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.3))"
+                  : "drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.2))",
+              }
+        }
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+        cursor="pointer"
+        whileHover={{
+          scale: 1.1,
+          rotate: [0, 5, -5, 0],
+          filter: isDarkMode
+            ? "drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.6))"
+            : "drop-shadow(0px 0px 15px rgba(0, 0, 0, 0.4))",
+          transition: { duration: 0.6, repeat: Infinity, repeatType: "mirror" },
+        }}
+        onClick={() => {
+          setClicked(true);
+          setTimeout(() => {
+            window.location.href = '/home';
+          }, 800); // sesuai durasi animasi
+        }}
+      />
+    </Box>
   );
-};
+}
 
-export default SplashScreen;
+export default LoadScreen;
