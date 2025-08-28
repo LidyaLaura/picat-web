@@ -9,29 +9,34 @@ const MotionImage = motion(Image);
 function Card({ title, url, isDarkMode }) {
   return (
     <MotionBox
-      bgColor={isDarkMode ? "gray.600" : "gray.300"}
+      bgImage={`url(../assets/${isDarkMode ? 'dark' : 'light'}-${title}-card.png)`}
+      bgSize={"cover"}
       onClick={() => window.location = url}
       cursor={'pointer'}
-      width={"300px"}
+      width={"250px"}
       height={"500px"}
-      borderRadius={"10px"}
+      borderRadius={"37px"}
       display={"flex"}
+      zIndex={2}
       justifyContent={"center"}
       alignItems={"center"}
       whileHover={{
         scale: 1.05,
         boxShadow: isDarkMode
           ? "0px 0px 20px rgba(255, 255, 255, 0.4)"
-          : "0px 0px 20px rgba(0, 0, 0, 0.2)"
+          : "0px 0px 20px rgba(0, 0, 0, 0.2)",
       }}
       whileTap={{ scale: 0.95 }}
       initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0, 
+        boxShadow: isDarkMode
+          ? "0px 0px 2px rgba(255, 255, 255, 0.4)"
+          : "0px 0px 2px rgba(0, 0, 0, 0.2)",
+      }}
+      transition={{ duration: 0.6, boxShadow: { duration: 0.4 }  }}
     >
-      <Text color={isDarkMode ? 'white' : 'black'} fontSize={"35px"}>
-        {title}
-      </Text>
     </MotionBox>
   );
 }
@@ -47,7 +52,10 @@ function Home() {
       height={"100%"}
       display={"flex"}
       flexDir={"column"}
+      bgImage={`url(../assets/${isDarkMode ? 'dark' : 'light'}-linear-bg.png)`}
+      bgSize={"cover"}
     >
+      <Box zIndex={2} width={"100%"} height={"100%"} position={"absolute"} bgImage={`url(../assets/${isDarkMode ? 'dark' : 'light'}-layer-bg.png)`}></Box>
       <Navbar />
 
       {/* Background fade-in */}
@@ -71,7 +79,7 @@ function Home() {
         marginTop={"-80px"}
         marginLeft={"-50px"}
         rotate="155deg"
-        zIndex={-1}
+        zIndex={1}
         position={"absolute"}
         top={1}
         left={1}
@@ -88,19 +96,19 @@ function Home() {
         display={"flex"}
         flexWrap={"wrap"}
         minHeight={"550px"}
-        gap={"30px"}
+        gap={"80px"}
         justifyContent={"center"}
         alignItems={"center"}
         flexDir={"row"}
       >
-        <Card title={"Movies"} url={'/movie'} isDarkMode={isDarkMode} />
+        <Card title={"Movie"} url={'/movie'} isDarkMode={isDarkMode} />
         <Card title={"Music"} url={'/music'} isDarkMode={isDarkMode} />
-        <Card title={"Books"} url={'/book'} isDarkMode={isDarkMode} />
+        <Card title={"Book"} url={'/book'} isDarkMode={isDarkMode} />
       </Box>
 
       {/* Floating Cat Bottom */}
       <MotionImage
-        zIndex={-1}
+        zIndex={1}
         position={"absolute"}
         bottom={1}
         right={1}
