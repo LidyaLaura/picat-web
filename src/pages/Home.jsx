@@ -101,9 +101,9 @@ function Home() {
         alignItems={"center"}
         flexDir={"row"}
       >
-        <Card title={"Movie"} url={'/movie'} isDarkMode={isDarkMode} />
-        <Card title={"Music"} url={'/music'} isDarkMode={isDarkMode} />
-        <Card title={"Book"} url={'/book'} isDarkMode={isDarkMode} />
+        <Card title={"movie"} url={'/movie'} isDarkMode={isDarkMode} />
+        <Card title={"music"} url={'/music'} isDarkMode={isDarkMode} />
+        <Card title={"book"} url={'/book'} isDarkMode={isDarkMode} />
       </Box>
 
       {/* Floating Cat Bottom */}
