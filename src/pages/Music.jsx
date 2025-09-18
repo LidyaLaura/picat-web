@@ -120,7 +120,7 @@ function Music() {
           mb="7px" 
           maxW="600px"
         >
-          Aplikasi ini adalah alat untuk memprediksi kategori musik (genre) berdasarkan judul atau lirik yang Anda berikan.
+          This web is a tool for predicting the genre of a Music based on the title or description you provide.
         </MotionText>
 
         {/* Input + Search area */}

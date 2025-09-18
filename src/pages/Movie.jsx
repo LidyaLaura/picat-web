@@ -120,7 +120,7 @@ function Movie() {
           mb="7px" 
           maxW="600px"
         >
-          Aplikasi ini adalah alat untuk memprediksi kategori film (genre) berdasarkan judul atau deskripsi yang Anda berikan.
+          This web is a tool for predicting the genre of a Movie based on the title or description you provide.
         </MotionText>
 
         {/* Input + Search area */}

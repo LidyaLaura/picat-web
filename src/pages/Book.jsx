@@ -120,7 +120,7 @@ function Book() {
           mb="7px" 
           maxW="600px"
         >
-          Aplikasi ini adalah alat untuk memprediksi kategori buku (genre) berdasarkan judul atau sinopsis yang Anda berikan.
+          This web is a tool for predicting the genre of a Book based on the title or description you provide.
         </MotionText>
 
         {/* Input + Search area */}
